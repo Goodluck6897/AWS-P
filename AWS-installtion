@@ -1,2 +1,12 @@
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+aws configure
+aws sts get-caller-identity
+Created EKS cluster
+#eksctl create cluster -f eks-config.yaml
+https://github.com/Goodluck6897/CKA/blob/main/Day%2044/eks-config.yaml
+
+To login to EKS cluster
+#aws eks update-kubeconfig --region <your-region> --name <your-cluster-name>
+#aws eks update-kubeconfig --region us-east-2 --name cwvj-eks-cluster
+
 
