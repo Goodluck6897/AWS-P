@@ -1,7 +1,10 @@
 Create a user s3-assume-user
-Create a role with trust policy Role 
-Name:Role-For-S3-assume-user
 
+
+Create a role with trust policy Role 
+
+Name:Role-For-S3-assume-user
+```yaml
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -14,6 +17,7 @@ Name:Role-For-S3-assume-user
         }
     ]
 }
+```
 
 Add S3 Full access to the role  Role-For-S3-assume-user
 
