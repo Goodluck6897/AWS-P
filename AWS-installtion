@@ -10,3 +10,7 @@ To login to EKS cluster
 #aws eks update-kubeconfig --region us-east-2 --name cwvj-eks-cluster
 
 
+To delete cluster focefully
+aws eks delete-nodegroup --cluster-name cwvj-eks-cluster --nodegroup-name cwvj-eks-priv-ng --region us-east-2
+aws eks delete-nodegroup --cluster-name your-cluster-name --nodegroup-name your-nodegroup-name --region us-east-2
+aws eks delete-cluster --name cwvj-eks-cluster --region us-east-2
