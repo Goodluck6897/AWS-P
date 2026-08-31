@@ -14,3 +14,42 @@ To delete cluster focefully
 aws eks delete-nodegroup --cluster-name cwvj-eks-cluster --nodegroup-name cwvj-eks-priv-ng --region us-east-2
 aws eks delete-nodegroup --cluster-name your-cluster-name --nodegroup-name your-nodegroup-name --region us-east-2
 aws eks delete-cluster --name cwvj-eks-cluster --region us-east-2
+
+
+
+Permanently switch the active namespace:
+kubectl config set-context --current --namespace=<your-namespace-name>
+
+
+To log into your control plane node (my-second-cluster-control-plane), run:bash
+docker exec -it my-second-cluster-control-plane /bin/bash
+
+Create a Deployment
+https://github.com/Goodluck6897/CKA/blob/main/Day%2012/frontend.yaml
+
+vm@VCHOWDARY-MAC AWS % kubectl get pods -o wide
+NAME                               READY   STATUS    RESTARTS   AGE   IP           NODE                        NOMINATED NODE   READINESS GATES
+frontend-deploy-67447bb9ff-2t2xx   1/1     Running   0          21m   10.244.1.2   my-second-cluster-worker    <none>           <none>
+frontend-deploy-67447bb9ff-rp7xr   1/1     Running   0          21m   10.244.2.2   my-second-cluster-worker2   <none>           <none>
+frontend-deploy-67447bb9ff-zfzbt   1/1     Running   0          21m   10.244.2.3   my-second-cluster-worker2   <none>           <none>
+vm@VCHOWDARY-MAC AWS % 
+
+
+vm@VCHOWDARY-MAC AWS % kubectl get svc -o wide 
+NAME           TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+frontend-svc   NodePort   10.96.20.141   <none>        80:31000/TCP   22m   app=frontend
+vm@VCHOWDARY-MAC AWS % 
+
+vm@VCHOWDARY-MAC AWS % kubectl get nodes -o wide 
+NAME                              STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION    CONTAINER-RUNTIME
+my-second-cluster-control-plane   Ready    control-plane   15m   v1.31.4   172.18.0.5    <none>        Debian GNU/Linux 12 (bookworm)   7.0.12-linuxkit   containerd://1.7.24
+my-second-cluster-worker          Ready    <none>          15m   v1.31.4   172.18.0.7    <none>        Debian GNU/Linux 12 (bookworm)   7.0.12-linuxkit   containerd://1.7.24
+my-second-cluster-worker2         Ready    <none>          15m   v1.31.4   172.18.0.6    <none>        Debian GNU/Linux 12 (bookworm)   7.0.12-linuxkit   containerd://1.7.24
+vm@VCHOWDARY-MAC AWS % 
+
+Logged in to control plane
+
+vm@VCHOWDARY-MAC AWS % docker exec -it my-second-cluster-control-plane /bin/bash
+
+root@my-second-cluster-control-plane:/# curl http://172.18.0.7:31000
+<!DOCTYPE html> IT WORKED
