@@ -53,3 +53,24 @@ vm@VCHOWDARY-MAC AWS % docker exec -it my-second-cluster-control-plane /bin/bash
 
 root@my-second-cluster-control-plane:/# curl http://172.18.0.7:31000
 <!DOCTYPE html> IT WORKED
+
+
+
+i created clusterip
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc-1
+spec:
+  type: ClusterIP 
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 82         # ClusterIP service port
+      targetPort: 80   # The container’s port
+     # nodePort: 31000  # NodePort (must be within 30000-32767)
+
+logged in to control plane and
+curl http://<serviceip>:82
+it worked
