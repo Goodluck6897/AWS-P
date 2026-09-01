@@ -47,12 +47,98 @@ spec:
 
 
 
-
-3. objectName: username (in secretObjects) — Must it match the Secret key?
-NO ❌ — It must match the objectAlias from jmesPath, not the AWS secret key.
-
-So if you used objectAlias: myuser, then you'd need objectName: myuser here.
-
-4. key: username (in secretObjects) — Must it match the Secret key?
-NO ❌ — This can be any name you choose. It defines the key name inside the Kubernetes Secret.
-
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/created-by: eks-workshop
+    app.kubernetes.io/type: app
+  name: catalog
+  namespace: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: service
+      app.kubernetes.io/instance: catalog
+      app.kubernetes.io/name: catalog
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/component: service
+        app.kubernetes.io/created-by: eks-workshop
+        app.kubernetes.io/instance: catalog
+        app.kubernetes.io/name: catalog
+    spec:
+      containers:
+        - env:
+            - name: RETAIL_CATALOG_PERSISTENCE_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username **# ← YES! This must match the "key" in secretObjects**
+                  name: catalog-secret **# ← Must match the "secretName" in secretObjects**
+            - name: RETAIL_CATALOG_PERSISTENCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: catalog-secret
+          envFrom:
+            - configMapRef:
+                name: catalog
+          image: public.ecr.aws/aws-containers/retail-store-sample-catalog:1.2.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 3
+          name: catalog
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 5
+            successThreshold: 3
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - mountPath: /etc/catalog-secret
+              name: catalog-secret
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp-volume
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: catalog
+      volumes:
+        - csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: catalog-spc
+          name: catalog-secret
+        - emptyDir:
+            medium: Memory
+          name: tmp-volume
+```
