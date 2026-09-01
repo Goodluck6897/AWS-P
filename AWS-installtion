@@ -101,6 +101,14 @@ test.txt
 /data # 
 
 
+vm@VCHOWDARY-MAC AWS % kubectl exec -it pv-recycler -c pv-recycler -- /bin/sh
+# ls
+bin  boot  dev	docker-entrypoint.d  docker-entrypoint.sh  etc	home  lib  media  mnt  opt  proc  product_uuid	root  run  sbin  scrub	srv  sys  tmp  usr  var
+# df -hP
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         453G  8.9G  421G   3% /scrub
+# 
 
+we can see the path: /hostpath33 on the node the pod has run
 
 
