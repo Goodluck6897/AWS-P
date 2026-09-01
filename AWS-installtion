@@ -74,3 +74,33 @@ spec:
 logged in to control plane and
 curl http://<serviceip>:82
 it worked
+
+
+
+vm@VCHOWDARY-MAC AWS % kubectl get events
+LAST SEEN   TYPE      REASON        OBJECT           MESSAGE
+9m23s       Normal    Scheduled     pod/my-csi-app   Successfully assigned app/my-csi-app to my-second-cluster-worker
+85s         Warning   FailedMount   pod/my-csi-app   MountVolume.SetUp failed for volume "my-csi-inline-vol" : kubernetes.io/csi: mounter.SetUpAt failed to get CSI client: driver name inline.storage.kubernetes.io not found in the list of registered CSI drivers
+vm@VCHOWDARY-MAC AWS % 
+here also you can see the above
+kubectl describe pod my-csi-app
+
+
+==
+With Emptydir
+https://github.com/Goodluck6897/CKA/blob/main/Day%2026/emptyDir.yaml
+
+Verify the folder exists inside the running container by writing a test file:bash
+kubectl exec my-csi-app -- sh -c "echo 'hello storage' > /data/test.txt"
+
+To Login:
+vm@VCHOWDARY-MAC AWS % kubectl exec -it my-csi-app -c my-frontend -- /bin/sh
+/ # cd data/
+/data # ls
+test.txt
+/data # 
+
+
+
+
+
