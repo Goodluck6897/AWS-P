@@ -256,6 +256,20 @@ system_u:system_r:kernel_t:s0         4 ?        00:00:00 kworker/R-rcu_gp
 system_u:system_r:kernel_t:s0         5 ?        00:00:00 kworker/R-sync_wq
 
 
+mkdir /testselinux
+[root@rhel ~]# touch /testselinux/file
+[root@rhel ~]# sudo chcon -t httpd_sys_content_t /testselinux^C
+[root@rhel ~]# ls -l /testselinux/
+total 0
+-rw-r--r--. 1 root root 0 Sep  4 18:52 file
+[root@rhel ~]# ls -ld /testselinux/
+drwxr-xr-x. 2 root root 18 Sep  4 18:52 /testselinux/
+
+[root@rhel ~]# sudo chcon -t httpd_sys_content_t /testselinux
+
+[root@rhel ~]# ls -Zd /testselinux
+unconfined_u:object_r:httpd_sys_content_t:s0 /testselinux
+
 
 
 In SELinux, files and processes use different types of labels:
