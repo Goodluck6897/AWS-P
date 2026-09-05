@@ -328,6 +328,26 @@ Now, even if the server reboots or the file system is completely relabeled, SELi
 Would you like to see how to use semanage for other things, like changing a network port (e.g., making SSH run on port 2222 instead of 22), or would you prefer to see how to delete a rule you no longer need?
 
 
+Special Variables
+----
+#!/bin/bash
+
+echo "Script name : $0"
+echo "First arg   : $1"
+echo "Second arg  : $2"
+echo "Total args  : $#"
+echo "All args    : $@"
+echo "Process ID  : $$"
+
+
+$ ./myscript.sh hello world
+Script name : ./myscript.sh
+First arg   : hello
+Second arg  : world
+Total args  : 2
+All args    : hello world
+Process ID  : 5678
+
 
 
 
