@@ -184,6 +184,104 @@ setfacl -x u:john filename
 # Remove ALL ACLs
 setfacl -b filename
 
+######**SELinux**
+
+
+How SELinux Labels Work (The Secret Sauce)SELinux makes decisions based on labels attached to every single file, process, and user on the system. These labels follow a format: **user:role:type:level**.The most important part of this label is the Type (called Type Enforcement).If you run ls -Z (the -Z flag is how you view SELinux contexts), you will see something like this:
+
+**ls -Z /var/www/html/index.html
+-rw-r--r--. root root unconfined_u:object_r:httpd_sys_content_t:s0 index.html
+**
+
+Look at httpd_sys_content_t. This label tells SELinux: "This file belongs to the Apache Web Server." If the Apache process (which runs under the type httpd_t) tries to read this file, SELinux says "Yes." If a malicious hacker hijacks a different process and tries to read it, SELinux says "No."
+
+getenforce
+# Output: Enforcing, Permissive, or Disabled
+
+
+
+| Output | Meaning | Security Status |
+| :--- | :--- | :--- |
+| **`Enforcing`** | SELinux is active and aggressively guarding your system. Any action that violates your security policies is blocked immediately and logged. | 🔒 Fully Protected (Default & Recommended) |
+| **`Permissive`** | SELinux is active but won't block anything. It lets every action slide, but it logs a warning (an AVC denial) whenever a rule is broken. This is mostly used for debugging and troubleshooting apps. | ⚠️ Auditing Only (No actual blocking) |
+| **`Disabled`** | SELinux is completely turned off. The security policies are not loaded, and the system is not actively labeling files. | ❌ Unprotected |
+
+
+The primary log file for SELinux is /var/log/audit/audit.log
+
+[root@rhel ~]# sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33
+[root@rhel ~]# 
+
+
+Permanent configuration file:
+
+#cat /etc/selinux/configKey Concepts
+1. Security Context (Labels)
+Every file, process, and port has a security label with four parts:
+user:role:type:level
+Example:
+
+
+[root@rhel ~]# ls -Z /etc/passwd
+system_u:object_r:passwd_file_t:s0 /etc/passwd
+[root@rhel ~]# 
+
+
+[root@rhel ~]# ls -Z /etc/ssh/
+     system_u:object_r:etc_t:s0 moduli                  system_u:object_r:sshd_key_t:s0 ssh_host_ed25519_key.pub
+     system_u:object_r:etc_t:s0 ssh_config              system_u:object_r:sshd_key_t:s0 ssh_host_rsa_key
+     system_u:object_r:etc_t:s0 ssh_config.d            system_u:object_r:sshd_key_t:s0 ssh_host_rsa_key.pub
+system_u:object_r:sshd_key_t:s0 ssh_host_ecdsa_key           system_u:object_r:etc_t:s0 sshd_config
+system_u:object_r:sshd_key_t:s0 ssh_host_ecdsa_key.pub       system_u:object_r:etc_t:s0 sshd_config.d
+system_u:object_r:sshd_key_t:s0 ssh_host_ed25519_key
+[root@rhel ~]# 
+
+
+root@rhel ~]# ps -eZ | head
+LABEL                               PID TTY          TIME CMD
+system_u:system_r:init_t:s0           1 ?        00:00:18 systemd
+system_u:system_r:kernel_t:s0         2 ?        00:00:00 kthreadd
+system_u:system_r:kernel_t:s0         3 ?        00:00:00 pool_workqueue_release
+system_u:system_r:kernel_t:s0         4 ?        00:00:00 kworker/R-rcu_gp
+system_u:system_r:kernel_t:s0         5 ?        00:00:00 kworker/R-sync_wq
+
+
+
+
+In SELinux, files and processes use different types of labels:
+
+* Files and Directories get Object Labels (like httpd_sys_content_t).
+* Running Processes get Domain Labels (like httpd_t).
+
+Because they are different, you have to use different commands to see them.
+## 1. How to see the Process Label (httpd_t)
+To see the SELinux label of the actual running Apache web server process, use the -Z flag with the ps command:
+
+ps -eZ | grep httpd
+
+
+* Expected Output: You will see lines starting with system_u:system_r:httpd_t:s0, proving the Apache process runs inside the httpd_t domain.
+
+## 2. How SELinux connects the two
+SELinux sits in the background with a massive checklist (the policy). When the Apache process tries to look inside your directory, SELinux checks its list for a rule that matches both labels:
+
+📜 SELinux Policy Rule: Allow a process of type httpd_t to read a directory of type httpd_sys_content_t.
+
+Because that rule exists in RHEL, the access succeeds. If another process running as a different domain (like ftpd_t for an FTP server) tries to access it, SELinux checks the list, finds no matching allow rule, and blocks it.
+------------------------------
+
+
+
 
 
 
