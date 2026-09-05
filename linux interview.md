@@ -285,3 +285,35 @@ Because that rule exists in RHEL, the access succeeds. If another process runnin
 
 
 
+
+## The Real-World Use Case
+Imagine you change your Apache web server settings so it loads website files from a custom folder like /website instead of the default /var/www/html.
+By default, SELinux will label your new /website folder as generic files (default_t), and Apache will be blocked from reading them, causing a 403 Forbidden Error.
+Here is how you fix that permanently using semanage fcontext and restorecon:
+## Step 1: Tell SELinux the new permanent policy rule
+You use semanage fcontext to write a new rule into the SELinux policy database.
+
+sudo semanage fcontext -a -t httpd_sys_content_t "/website(/.*)?"
+
+
+* -a: Means add a new rule.
+* -t httpd_sys_content_t: Specifies the web server type label.
+* "/website(/.*)?": This is a regular expression. It tells SELinux to apply this rule to the /website directory and every file or subfolder inside it.
+
+## Step 2: Apply the new rule to the actual files
+Running semanage only updates the central database; it doesn't change the files on your disk yet. To force the files to read the new database rule, you run restorecon:
+
+sudo restorecon -R -v /website
+
+
+* -R: Means recursive (apply to all subfolders and files).
+* -v: Means verbose (show you the changes on the screen).
+
+Now, even if the server reboots or the file system is completely relabeled, SELinux will always remember that /website belongs to Apache.
+------------------------------
+Would you like to see how to use semanage for other things, like changing a network port (e.g., making SSH run on port 2222 instead of 22), or would you prefer to see how to delete a rule you no longer need?
+
+
+
+
+
