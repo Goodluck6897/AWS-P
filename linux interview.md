@@ -48,7 +48,7 @@ redirections
 | `command 2> file` | Redirect stderr to file |
 | `command 2>/dev/null` | Discard all errors |
 | `command &> file` | Redirect both stdout + stderr to file |
-| `command > file 2>&1` | Same as above (older syntax) |
+| `command > file 2>&1` | Same as above (older syntax) |.  XXXXX
 | `command >> file` | Append stdout to file |
 | `command 2>> file` | Append stderr to file |
 | `command > out.txt 2> err.txt` | Separate stdout and stderr into different files |
