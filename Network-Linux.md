@@ -1,3 +1,4 @@
+```text
 Application
     |
 glibc / NSS
@@ -20,3 +21,5 @@ DNS Server (Recursive resolution)
     |     TLD, and Authoritative DNS servers worldwide.
     v
 Root DNS -> .com TLD -> Authoritative DNS -> IP Address Returned
+
+```text
