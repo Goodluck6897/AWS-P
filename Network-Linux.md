@@ -1,3 +1,5 @@
+The diagram traces how an application’s request to resolve www.example.com moves from your local system config files out into the public internet. Here are the exact gateway needs within this flow: [1] (https://wiki.archlinux.org/title/Domain_name_resolution), [2] (https://www.freecodecamp.org/news/how-dns-works-the-internets-address-book/)
+
 ```text
 Application
     |
@@ -22,4 +24,4 @@ DNS Server (Recursive resolution)
     v
 Root DNS -> .com TLD -> Authoritative DNS -> IP Address Returned
 
-```text
+```
