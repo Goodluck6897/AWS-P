@@ -1,3 +1,7 @@
+Todo
+###
+check iam policy for MCP
+
 https://towardsthecloud.com/aws-cli-assume-iam-role
 
 
