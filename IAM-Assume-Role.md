@@ -25,3 +25,8 @@ Name:Role-For-S3-assume-user
 Add S3 Full access to the role  Role-For-S3-assume-user
 
 Login to the user S3-assume-user and switch role provide Role-For-S3-assume-user
+
+
+IAM Notes
+##
+We can see the logs of the IAM user access... in cloud trail
